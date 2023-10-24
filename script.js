@@ -29,7 +29,10 @@ function setFileContents(contents)
     let file_contents = document.getElementById("file-contents");
     if (file_contents) {
         // WARNING: this is not safe; validate contents
-        file_contents.innerHTML = contents;
+        contents = contents.replace("&", "&amp;");
+        contents = contents.replace("<", "&lt;");
+        contents = contents.replace(">", "&gt;");
+        file_contents.innerHTML = "<pre><code>" + contents + "</code></pre>";
     } else {
         console.error("could not find element: file-contents");
     }
