@@ -17,10 +17,20 @@
 
       <label for="load-file">Choose a file:</label>
       <input type="file" id="load-file" name="load-file">
-      <button id="load-button" onclick="loadFile()">Load</button>
-      <button id="clear-button" onclick="resetFileContents()">Clear</button>
+      <button id="load-file-button" onclick="loadFile()">Load File</button>
+      <button id="clear-file-button" onclick="resetFileContents()">Clear File</button>
 
       <h3 id="file-contents">File contents will appear here</h3>
+    </div>
+    <div>
+      <h2>Generating table from JSON</h2>
+
+      <label for="load-table">Choose a file:</label>
+      <input type="file" id="load-table" name="load-table">
+      <button id="load-table-button" onclick="loadTable()">Load Table</button>
+      <button id="clear-file-button" onclick="resetTableFileContents()">Clear Table</button>
+
+      <div id="table-contents">Table contents:</div>
     </div>
     <script src="script.js"></script>
   </body>

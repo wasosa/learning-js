@@ -1,0 +1,19 @@
+{
+    "transactions": [
+        {
+            "date": "1/1/23",
+            "name": "balloons",
+            "amount": 12.34
+        },
+        {
+            "date": "2/14/23",
+            "name": "chocolate",
+            "amount": 23.45
+        },
+        {
+            "date": "3/14/23",
+            "name": "pie",
+            "amount": 34.56
+        }
+    ]
+}
