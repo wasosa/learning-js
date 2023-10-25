@@ -1,4 +1,18 @@
 ///////////////////////////
+// COMMON FUNCTIONS
+///////////////////////////
+
+function sanitizeContents(contents)
+{
+    console.log("# sanitizeContents()");
+    console.log(contents);
+    contents = contents.replaceAll("&", "&amp;");
+    contents = contents.replaceAll("<", "&lt;");
+    contents = contents.replaceAll(">", "&gt;");
+    return "<pre><code>" + contents + "</code></pre>";
+}
+
+///////////////////////////
 // LOADING A FILE FROM DISK
 ///////////////////////////
 
@@ -28,11 +42,7 @@ function setFileContents(contents)
     console.debug("# setFileContents()");
     let file_contents = document.getElementById("file-contents");
     if (file_contents) {
-        // WARNING: this is not safe; validate contents
-        contents = contents.replaceAll("&", "&amp;");
-        contents = contents.replaceAll("<", "&lt;");
-        contents = contents.replaceAll(">", "&gt;");
-        file_contents.innerHTML = "<pre><code>" + contents + "</code></pre>";
+        file_contents.innerHTML = sanitizeContents(contents);
     } else {
         console.error("could not find element: file-contents");
     }
@@ -41,55 +51,80 @@ function setFileContents(contents)
 // Called by clicking "Clear File" button
 function resetFileContents()
 {
-    setFileContents("File contents will appear here.");
+    setFileContents("");
 }
 
-// Called by clicking "Clear Table" button
-function resetTableContents()
+/////////////////////////////////////
+// LOADING A FILE FROM THE WEB SERVER
+/////////////////////////////////////
+
+// Called by clicking "Load File" button
+async function loadServerFile()
 {
-    setFileContents("File contents will appear here.");
+    console.debug("# loadServerFile()");
+    let obj = await fetch("/sample.json");
+    let contents = await obj.text();
+    setServerFileContents(contents);
+}
+
+function setServerFileContents(contents)
+{
+    console.debug("# setServerFileContents()");
+    let server_file_contents = document.getElementById("server-file-contents");
+    if (server_file_contents) {
+        server_file_contents.innerHTML = sanitizeContents(contents);
+    } else {
+        console.error("could not find element: server-file-contents");
+    }
+}
+
+// Called by clicking "Clear File" button
+function resetServerFileContents()
+{
+    setServerFileContents("");
 }
 
 ///////////////////////////////
 // GENERATING A TABLE FROM JSON
 ///////////////////////////////
 
-function loadTable()
+async function generateTableFromJSON()
 {
-    console.debug("# loadTable()");
-    let tableFile = document.getElementById("load-table").files[0];
-    if (tableFile) {
-        console.debug("a table file has been chosen");
-        let reader = new FileReader();
-        reader.readAsText(tableFile, "UTF-8");
-        reader.onload = tableFileLoaded;
+    contents = await displayTableSource("/sample.json");
+    displayRenderedTable(contents);
+}
+
+async function displayTableSource(filename)
+{
+    let obj = await fetch(filename);
+    let contents = await obj.text();
+    let element = document.getElementById('table-source');
+    if (element) {
+        element.innerHTML = sanitizeContents(contents);
     } else {
-        console.debug("no table file has been chosen");
+        console.error('Could not find #table-source');
     }
+    return contents;
 }
 
-function tableFileLoaded(event) {
-    console.debug("# tableFileLoaded()");
-    contents = event.target.result;
-    setTableFileContents(contents);
-}
-
-function setTableFileContents(_contents)
+function displayRenderedTable(contents)
 {
-    console.debug("# setTableFileContents()");
+    let element = document.getElementById('table-render');
+    if (element) {
+        element.append(generateTable(contents));
+    } else {
+        console.error('Could not find #table-element');
+    }
+}
 
-    let table_contents = document.getElementById("table-contents");
-    if (!table_contents) {
-        console.error("could not find element: table-contents");
+function generateTable(contents)
+{
+    console.debug("# generateTable()");
+
+    if (!contents) {
         return;
     }
-
-    let contents = JSON.parse(_contents)
-    let transactions = contents["transactions"] || null;
-    if (!transactions) {
-        return;
-    }
-
+    let transactions = JSON.parse(contents).transactions;
     let table = document.createElement('table');
     let cols = Object.keys(transactions[0]);
     let tr = document.createElement('tr');
@@ -111,20 +146,15 @@ function setTableFileContents(_contents)
         }
         table.append(tr);
     }
-    table_contents.append(table);
+    return table;
 }
 
-// Called by clicking "Clear File" button
-function resetTableFileContents()
-{
-    setTableFileContents("{}");
-}
-
-function main()
+async function main()
 {
     console.debug("# main()");
     resetFileContents();
-    resetTableFileContents();
+    resetServerFileContents();
+    await generateTableFromJSON();
 }
 
 // ---------- start of testing code ----------
