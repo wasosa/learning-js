@@ -62,7 +62,7 @@ function resetFileContents()
 async function loadServerFile()
 {
     console.debug("# loadServerFile()");
-    let obj = await fetch("/sample.json");
+    let obj = await fetch("sample.json");
     let contents = await obj.text();
     setServerFileContents(contents);
 }
@@ -90,7 +90,7 @@ function resetServerFileContents()
 
 async function generateTableFromJSON()
 {
-    contents = await displayTableSource("/sample.json");
+    contents = await displayTableSource("sample.json");
     displayRenderedTable(contents);
 }
 
